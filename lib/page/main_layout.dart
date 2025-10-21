@@ -5,8 +5,10 @@ import 'package:time_vault/page/focus_page.dart';
 import 'package:time_vault/page/leisure_page.dart';
 import 'package:time_vault/page/shop_page.dart';
 
+import '../app_colors.dart';
 import '../services/TimerService.dart';
 import '../widgets/ActiveTimeBar.dart';
+import '../widgets/side_nav.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -23,32 +25,17 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.bg,
       body: Row(
         children: [
-          NavigationRail(
+
+          // Side Bar
+          SideNav(
             selectedIndex: _selectedIndex,
-            onDestinationSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            destinations: const [
-              NavigationRailDestination(
-                icon: Icon(Icons.home),
-                label: Text('Focus'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.home),
-                label: Text('Leisure'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.home),
-                label: Text('Shop'),
-              ),
-            ],
+            onItemSelected: (i) => setState(() => _selectedIndex = i),
           ),
 
-          const VerticalDivider(thickness: 1, width: 1),
+          // const VerticalDivider(thickness: 1, width: 1),
 
           Expanded(
             child: Column(
