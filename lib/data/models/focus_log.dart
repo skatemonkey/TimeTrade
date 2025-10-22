@@ -1,4 +1,3 @@
-import 'package:time_vault/core/date_utils.dart';
 
 class FocusLogFields {
   static const String table = 'focus_log';

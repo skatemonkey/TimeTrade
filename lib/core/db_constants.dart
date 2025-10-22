@@ -1,6 +1,7 @@
 import 'package:time_vault/data/models/focus_log.dart';
 import 'package:time_vault/data/models/leisure_ledger.dart';
 
+import '../data/models/life_pillar.dart';
 import '../data/models/points_ledger.dart';
 
 class DbConstants {
@@ -35,4 +36,18 @@ class DbConstants {
             ${PointsLedgerFields.delta}   REAL NOT NULL
         );
         ''';
+
+  String lifePillarTableCreation = '''
+        CREATE TABLE ${LifePillarFields.table}
+        (
+            ${LifePillarFields.id}          INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${LifePillarFields.name}        TEXT    NOT NULL,
+            ${LifePillarFields.scoreWeight} REAL    NOT NULL,
+            ${LifePillarFields.isActive}    INTEGER NOT NULL,
+            ${LifePillarFields.sortOrder}   INTEGER NOT NULL,
+            ${LifePillarFields.createdTs}   INTEGER NOT NULL,
+            ${LifePillarFields.updatedTs}   INTEGER NOT NULL
+        );
+        ''';
+
 }
