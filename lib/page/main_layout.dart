@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import 'package:time_vault/page/focus_page.dart';
 import 'package:time_vault/page/leisure_page.dart';
+import 'package:time_vault/page/life_pillar_page.dart';
+import 'package:time_vault/page/placeholder2_page.dart';
 import 'package:time_vault/page/shop_page.dart';
 
 import '../app_colors.dart';
@@ -20,7 +22,7 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [FocusPage(), LeisurePage(), ShopPage()];
+  final List<Widget> _pages = [FocusPage(), LeisurePage(), ShopPage(), LifePillarPage(), Placeholder2Page()];
 
   @override
   Widget build(BuildContext context) {

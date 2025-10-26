@@ -12,6 +12,13 @@ String formatDate(DateTime ts) =>
 DateTime parseDate(String raw) =>
     _buildTimeEntryFormatter().parse(raw);
 
+final DateFormat _formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+
+String formatTimestamp(int millis) {
+  final date = DateTime.fromMillisecondsSinceEpoch(millis);
+return _formatter.format(date);
+}
+
 
 String formatDate1(Duration d) {
   String two(int n) => n.toString().padLeft(2, '0');
