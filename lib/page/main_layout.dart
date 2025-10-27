@@ -22,7 +22,14 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [FocusPage(), LeisurePage(), ShopPage(), LifePillarPage(), Placeholder2Page()];
+  final List<Widget> _pages = [
+    FocusPage(),
+    LeisurePage(),
+    ShopPage(),
+    Placeholder2Page(),
+    LifePillarPage(),
+    Placeholder2Page(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +37,6 @@ class _MainLayoutState extends State<MainLayout> {
       backgroundColor: AppColors.bg,
       body: Row(
         children: [
-
           // Side Bar
           SideNav(
             selectedIndex: _selectedIndex,
@@ -38,7 +44,6 @@ class _MainLayoutState extends State<MainLayout> {
           ),
 
           // const VerticalDivider(thickness: 1, width: 1),
-
           Expanded(
             child: Column(
               children: [

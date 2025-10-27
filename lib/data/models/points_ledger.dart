@@ -48,8 +48,9 @@ class PointsLedger {
     );
   }
 
-  static double pointsFromDuration(Duration d) {
-    final points = d.inSeconds / 3600; //todo rmb to change to3600 seconds = 1 hour 1 point
+  static double pointsFromDuration(Duration d, double scoreWeight) {
+    // Each minute = 1 point × scoreWeight
+    final points = (d.inSeconds / 60) * scoreWeight;
     return double.parse(points.toStringAsFixed(2));
   }
 }

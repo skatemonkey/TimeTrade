@@ -6,6 +6,7 @@ class FocusLogFields {
   static final String startTs = 'start_ts';
   static final String endTs = 'end_ts';
   static final String duration = 'duration';
+  static final String lifePillarId = 'life_pillar_id';
 }
 
 class FocusLog {
@@ -13,12 +14,15 @@ class FocusLog {
   final int startTs;
   final int endTs;
   final double duration;
+  final int lifePillarId;
+
 
   FocusLog({
     this.id,
     required this.startTs,
     required this.endTs,
     required this.duration,
+    required this.lifePillarId
   });
 
   Map<String, Object?> toMap() {
@@ -27,6 +31,7 @@ class FocusLog {
       FocusLogFields.startTs: startTs,
       FocusLogFields.endTs: endTs,
       FocusLogFields.duration: duration,
+      FocusLogFields.lifePillarId: lifePillarId,
     };
   }
 
@@ -36,6 +41,7 @@ class FocusLog {
       startTs: map[FocusLogFields.startTs] as int,
       endTs: map[FocusLogFields.endTs] as int,
       duration: map[FocusLogFields.duration] as double,
+      lifePillarId: map[FocusLogFields.lifePillarId] as int,
     );
   }
 }

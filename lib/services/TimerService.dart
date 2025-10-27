@@ -9,6 +9,10 @@ import 'package:time_vault/data/models/focus_log.dart';
 import 'package:time_vault/data/models/leisure_ledger.dart';
 import 'package:time_vault/data/models/points_ledger.dart';
 
+// ADD THESE:
+import 'package:time_vault/data/dao/life_pillar_dao.dart';
+import 'package:time_vault/data/models/life_pillar.dart';
+
 enum SessionType { none, focus, entertainment }
 
 class TimerService extends ChangeNotifier {
@@ -57,12 +61,15 @@ class TimerService extends ChangeNotifier {
         s?.millisecondsSinceEpoch ?? DateTime.now().millisecondsSinceEpoch;
 
     final endTs = DateTime.now().millisecondsSinceEpoch;
+
+    // NOTE: ensure your FocusLog model has a `lifePillarId` field/param.
     final entry = FocusLog(
       startTs: startTs,
       endTs: endTs,
       duration: double.parse(
         (elapsed.inMilliseconds / 1000).toStringAsFixed(2),
       ),
+      lifePillarId: _selectedLifePillarId ?? 1, // <-- add this
     );
     final id = await FocusLogDao.instance.insert(entry);
 
@@ -71,7 +78,10 @@ class TimerService extends ChangeNotifier {
       source: 'earn',
       refType: 'time',
       refId: id,
-      delta: PointsLedger.pointsFromDuration(elapsed),
+      delta: PointsLedger.pointsFromDuration(
+        elapsed,
+        _selectedPillarWeightOrDefault(),
+      ),
     );
     await PointsLedgerDao.instance.insert(pointEntry);
     print(
@@ -132,5 +142,54 @@ class TimerService extends ChangeNotifier {
     _stopTickerIfIdle();
     notifyListeners();
     return used;
+  }
+
+  // ===== Life Pillars (owned here so selection persists) =====
+  List<LifePillar> _pillars = [];
+  bool _pillarsLoaded = false;
+  int? _selectedLifePillarId = 1; // default to pillar 1
+
+  List<LifePillar> get pillars => _pillars;
+
+  int? get selectedLifePillarId => _selectedLifePillarId;
+
+  /// Load once (call from page init with: `svc.ensurePillarsLoaded()`).
+  Future<void> ensurePillarsLoaded() async {
+    if (_pillarsLoaded) return;
+    _pillars = await LifePillarDao.instance.getAll();
+
+    if (_pillars.isEmpty) {
+      _selectedLifePillarId = null;
+    } else if (!_pillars.any((p) => p.id == 1)) {
+      _selectedLifePillarId = _pillars.first.id;
+    } else {
+      _selectedLifePillarId = 1;
+    }
+
+    _pillarsLoaded = true;
+    notifyListeners();
+  }
+
+  /// Force reload after CRUD elsewhere.
+  Future<void> reloadPillars() async {
+    _pillarsLoaded = false;
+    await ensurePillarsLoaded();
+  }
+
+  void setLifePillar(int id) {
+    if (_selectedLifePillarId == id) return;
+    _selectedLifePillarId = id;
+    notifyListeners();
+  }
+
+  double _selectedPillarWeightOrDefault() {
+    final id = _selectedLifePillarId;
+    if (id == null) return 1.0;
+
+    final idx = _pillars.indexWhere((p) => p.id == id);
+    if (idx == -1) return 1.0;
+
+    // Treat this as “points per minute” (or a multiplier) defined on the pillar
+    return _pillars[idx].scoreWeight;
   }
 }

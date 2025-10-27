@@ -7,13 +7,18 @@ import '../data/models/points_ledger.dart';
 class DbConstants {
   String focusLogTableCreation =
       '''
-          CREATE TABLE ${FocusLogFields.table}
-          (
-              ${FocusLogFields.id}        INTEGER PRIMARY KEY AUTOINCREMENT,
-              ${FocusLogFields.startTs}   INTEGER NOT NULL,
-              ${FocusLogFields.endTs}     INTEGER NOT NULL,
-              ${FocusLogFields.duration}  REAL NOT NULL
-          );
+        CREATE TABLE ${FocusLogFields.table}
+        (
+            ${FocusLogFields.id}           INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${FocusLogFields.startTs}      INTEGER NOT NULL,
+            ${FocusLogFields.endTs}        INTEGER NOT NULL,
+            ${FocusLogFields.duration}     REAL    NOT NULL,
+            ${FocusLogFields.lifePillarId} INTEGER NOT NULL,
+            FOREIGN KEY (${FocusLogFields.lifePillarId})
+                REFERENCES ${LifePillarFields.table} (${LifePillarFields.id})
+                ON DELETE CASCADE
+                ON UPDATE CASCADE
+        );
           ''';
   String leisureLedgerTableCreation =
       '''

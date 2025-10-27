@@ -30,7 +30,7 @@ class _ShopPageState extends State<ShopPage> {
   }
 
   Future<void> _buyOneHour() async {
-    const price = 1.0; // 1 point -> 1 hour (3600 sec)
+    const price = 240.0; // 1 point -> 1 hour (3600 sec)
 
     if (_points < price) {
       if (mounted) {
@@ -110,7 +110,7 @@ class _ShopPageState extends State<ShopPage> {
                 leading: const Icon(Icons.timer_outlined),
                 title: const Text('1 Hour Entertainment Time'),
                 subtitle: const Text(
-                  'Price: 1.00 point • Adds +3600s to wallet',
+                  'Price: 240.00 point • Adds +3600s to wallet',
                 ),
                 trailing: ElevatedButton(
                   onPressed: canBuy ? _buyOneHour : null,
