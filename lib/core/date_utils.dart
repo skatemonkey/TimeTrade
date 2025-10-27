@@ -12,11 +12,11 @@ String formatDate(DateTime ts) =>
 DateTime parseDate(String raw) =>
     _buildTimeEntryFormatter().parse(raw);
 
-final DateFormat _formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+final DateFormat _formatter = DateFormat('yyyy-MM-dd\n HH:mm:ss');
 
 String formatTimestamp(int millis) {
   final date = DateTime.fromMillisecondsSinceEpoch(millis);
-return _formatter.format(date);
+  return _formatter.format(date);
 }
 
 
