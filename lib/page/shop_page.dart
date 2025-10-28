@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:time_vault/data/dao/leisure_ledger_dao.dart';
 import 'package:time_vault/data/dao/points_ledger_dao.dart';
 import 'package:time_vault/data/models/leisure_ledger.dart';
+import 'package:time_vault/page/template_page.dart';
 
 import '../data/models/points_ledger.dart';
 
@@ -85,26 +86,55 @@ class _ShopPageState extends State<ShopPage> {
   Widget build(BuildContext context) {
     final canBuy = !_loading && _points >= 1.0;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Entertainment Shop')),
-      body: RefreshIndicator(
+    return TemplatePage(
+      title: "Shop",
+      actions: [
+        ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 180, maxWidth: 220),
+          child: Card(
+            elevation: 2,
+            margin: const EdgeInsets.only(left: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ListTile(
+              dense: true,
+              visualDensity: VisualDensity.compact,
+              title: const Text(
+                'Your Points',
+                style: TextStyle(fontSize: 12, color: Colors.black54),
+              ),
+              subtitle: Text(
+                _loading ? 'Updating…' : _points.toStringAsFixed(2),
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.refresh),
+                tooltip: 'Refresh',
+                onPressed: _loading ? null : _refreshPoints,
+              ),
+            ),
+          ),
+        ),
+      ],
+      child: RefreshIndicator(
         onRefresh: _refreshPoints,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Card(
-              child: ListTile(
-                title: const Text('Your Points'),
-                subtitle: Text(
-                  _loading ? 'Updating…' : _points.toStringAsFixed(2),
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: _loading ? null : _refreshPoints,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
+            // Card(
+            //   child: ListTile(
+            //     title: const Text('Your Points'),
+            //     subtitle: Text(
+            //       _loading ? 'Updating…' : _points.toStringAsFixed(2),
+            //     ),
+            //     trailing: IconButton(
+            //       icon: const Icon(Icons.refresh),
+            //       onPressed: _loading ? null : _refreshPoints,
+            //     ),
+            //   ),
+            // ),
+            // const SizedBox(height: 12),
             Card(
               child: ListTile(
                 leading: const Icon(Icons.timer_outlined),

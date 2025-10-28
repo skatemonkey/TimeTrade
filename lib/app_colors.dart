@@ -10,11 +10,15 @@ class AppColors {
   // dark circle
   static const Color dark = Color(0xFF1F222B);
 
+  static const Color accent1 = Color(0xFFE5EA4B);
+
   // yellow accents
   static const Color accent = Colors.amber;
 
   static const Color white = Colors.white;
   static const Color black = Colors.black;
+  static const Color softBlack = Color(0xFF1F222B);
 
+  // button color
 
 }

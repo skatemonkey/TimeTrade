@@ -5,6 +5,7 @@ import 'package:time_vault/page/focus_page.dart';
 import 'package:time_vault/page/leisure_page.dart';
 import 'package:time_vault/page/life_pillar_page.dart';
 import 'package:time_vault/page/placeholder2_page.dart';
+import 'package:time_vault/page/placeholder_page.dart';
 import 'package:time_vault/page/shop_page.dart';
 
 import '../app_colors.dart';
@@ -26,7 +27,7 @@ class _MainLayoutState extends State<MainLayout> {
     FocusPage(),
     LeisurePage(),
     ShopPage(),
-    Placeholder2Page(),
+    PlaceholderPage(),
     LifePillarPage(),
     Placeholder2Page(),
   ];
