@@ -5,6 +5,7 @@ import 'package:time_vault/data/dao/points_ledger_dao.dart';
 import 'package:time_vault/data/models/leisure_ledger.dart';
 import 'package:time_vault/page/template_page.dart';
 
+import '../app_colors.dart';
 import '../data/models/points_ledger.dart';
 
 class ShopPage extends StatefulWidget {
@@ -88,10 +89,12 @@ class _ShopPageState extends State<ShopPage> {
 
     return TemplatePage(
       title: "Shop",
+      actionsTopOffset: 30,
       actions: [
         ConstrainedBox(
           constraints: const BoxConstraints(minWidth: 180, maxWidth: 220),
           child: Card(
+            color: AppColors.white,
             elevation: 2,
             margin: const EdgeInsets.only(left: 12),
             shape: RoundedRectangleBorder(
@@ -136,6 +139,7 @@ class _ShopPageState extends State<ShopPage> {
             // ),
             // const SizedBox(height: 12),
             Card(
+              color: AppColors.bg,
               child: ListTile(
                 leading: const Icon(Icons.timer_outlined),
                 title: const Text('1 Hour Entertainment Time'),

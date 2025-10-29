@@ -26,6 +26,7 @@ class TemplatePage extends StatelessWidget {
     this.maxContentWidth,
     this.floatingActionButton,
     this.backgroundColor,
+    this.actionsTopOffset = 50, // 👈 small gap from top, tweak as you like
   });
 
   final String title;
@@ -39,6 +40,7 @@ class TemplatePage extends StatelessWidget {
   final double? maxContentWidth;
   final Widget? floatingActionButton;
   final Color? backgroundColor;
+  final double actionsTopOffset;
 
   @override
   Widget build(BuildContext context) {
@@ -66,52 +68,53 @@ class TemplatePage extends StatelessWidget {
       backgroundColor: bg,
       floatingActionButton: floatingActionButton,
       body: SafeArea(
-        child: Padding(
-          padding: pagePadding,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header row (title + optional actions)
-              Row(
+        child: Stack(
+          children: [
+            // Layer 1: normal page with top padding
+            Padding(
+              padding: pagePadding,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Title only (actions are floated separately)
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Card
                   Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      overflow: TextOverflow.ellipsis,
+                      child: content,
                     ),
                   ),
-                  if (actions != null) ...[
-                    const SizedBox(width: 12),
-                    Row(mainAxisSize: MainAxisSize.min, children: actions!),
-                  ],
                 ],
               ),
-              const SizedBox(height: 24),
+            ),
 
-              // Card
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: content,
-                ),
+            // Layer 2: floated actions (ignores pagePadding.top)
+            if (actions != null && actions!.isNotEmpty)
+              Positioned(
+                // we keep the right page padding, but NO top page padding
+                right: pagePadding.right,
+                top: actionsTopOffset, // a tiny gap from the SafeArea top
+                child: Row(mainAxisSize: MainAxisSize.min, children: actions!),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );
