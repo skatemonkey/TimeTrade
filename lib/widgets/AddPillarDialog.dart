@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../app_colors.dart';
 import '../data/models/life_pillar.dart';
 
 class AddPillarDialog extends StatefulWidget {
@@ -44,7 +45,14 @@ class _AddPillarDialogState extends State<AddPillarDialog> {
     final buttonLabel = widget.isEdit ? 'Update' : 'Save';
 
     return AlertDialog(
-      title: Text(title),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: AppColors.softBlack,
+        ),
+      ),
+      backgroundColor: AppColors.pill, // dialog background
       content: SizedBox(
         width: 420,
         child: Form(
@@ -90,9 +98,14 @@ class _AddPillarDialogState extends State<AddPillarDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text('Cancel', style: const TextStyle(color: AppColors.softBlack),),
         ),
         FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.softBlack,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               final now = DateTime.now().millisecondsSinceEpoch;
@@ -110,7 +123,10 @@ class _AddPillarDialogState extends State<AddPillarDialog> {
               Navigator.pop(context, item);
             }
           },
-          child: Text(buttonLabel),
+          child: Text(
+            buttonLabel,
+            style: const TextStyle(color: AppColors.white),
+          ),
         ),
       ],
     );
