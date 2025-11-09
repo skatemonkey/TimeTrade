@@ -17,7 +17,6 @@ class SideNav extends StatefulWidget {
 }
 
 class _SideNavState extends State<SideNav> {
-
   @override
   Widget build(BuildContext context) {
     // base colors from your reference
@@ -109,11 +108,15 @@ class _SideNavState extends State<SideNav> {
                     onTap: () => widget.onItemSelected(7),
                   ),
                   const SizedBox(height: 12),
-                  const CircleAvatar(
-                    radius: 22,
-                    backgroundImage: AssetImage('assets/avatar.jpg'),
-                    // replace if you have one
-                    backgroundColor: AppColors.white,
+                  _SideIcon(
+                    tooltip: "Profile",
+                    selected: widget.selectedIndex == 8,
+                    onTap: () => widget.onItemSelected(8),
+                    child: const CircleAvatar(
+                      radius: 22,
+                      backgroundImage: AssetImage('assets/avatar.jpg'),
+                      backgroundColor: AppColors.white,
+                    ),
                   ),
                 ],
               ),
@@ -148,13 +151,18 @@ class _Pill extends StatelessWidget {
 // Side ICON
 class _SideIcon extends StatefulWidget {
   const _SideIcon({
-    required this.icon,
+    this.icon,
+    this.child,
     required this.tooltip,
     required this.selected,
     required this.onTap,
-  });
+  }) : assert(
+         icon != null || child != null,
+         'Either icon or child must be provided.',
+       );
 
-  final IconData icon;
+  final IconData? icon;
+  final Widget? child;
   final String tooltip;
   final bool selected;
   final VoidCallback onTap;
@@ -188,7 +196,7 @@ class _SideIconState extends State<_SideIcon> {
             height: 44,
             width: 44,
             decoration: BoxDecoration(shape: BoxShape.circle, color: bg),
-            child: Icon(widget.icon, size: 22, color: color),
+            child: widget.child ?? Icon(widget.icon, size: 22, color: color),
           ),
         ),
       ),

@@ -34,6 +34,7 @@ class _MainLayoutState extends State<MainLayout> {
     PlaceholderPage(),
     PlaceholderPage(),
     PlaceholderPage(),
+    PlaceholderPage(),
   ];
 
   @override
