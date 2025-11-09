@@ -50,6 +50,8 @@ class HabitDao {
         SELECT h.id                                      AS habit_id,
                h.name                                    AS name,
                h.score_weight                            AS weight,
+               h.created_ts,
+               h.updated_ts,
                hl.id                                     AS log_id,
                CASE WHEN hl.id IS NULL THEN 0 ELSE 1 END AS completed_today
         FROM habit h

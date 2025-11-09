@@ -31,6 +31,9 @@ class AppDb {
       dbPath,
       options: OpenDatabaseOptions(
         version: 1,
+        onConfigure: (db) async {
+          await db.execute('PRAGMA foreign_keys = ON;');
+        },
         onCreate: (db, version) async {
           await db.execute(DbConstants().focusLogTableCreation);
           await db.execute(DbConstants().leisureLedgerTableCreation);

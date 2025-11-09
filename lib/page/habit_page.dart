@@ -111,6 +111,67 @@ class _HabitPageState extends State<HabitPage> {
     }
   }
 
+  Future<void> _editHabit(HabitVm vm) async {
+    // Convert VM → domain model for the dialog
+    final existing = Habit(
+      id: vm.id,
+      name: vm.name,
+      scoreWeight: vm.scoreWeight,
+      createdTs: vm.createdTs,
+      updatedTs: vm.updatedTs,
+    );
+
+    final updated = await showDialog<Habit?>(
+      context: context,
+      builder: (_) => AddHabitDialog(
+        isEdit: true,
+        existingItem: existing,
+      ),
+    );
+
+    if (updated != null) {
+      try {
+        await HabitDao.instance.update(updated);
+        await _loadHabits();
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to update: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _deleteHabit(HabitVm vm) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Delete Habit'),
+        content: Text('Are you sure you want to delete "${vm.name}"?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await HabitDao.instance.delete(vm.id);
+        await _loadHabits();
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to delete: $e')),
+          );
+        }
+      }
+    }
+  }
 
 
 
@@ -157,7 +218,8 @@ class _HabitPageState extends State<HabitPage> {
               onTap: () {
                 // TODO: navigate to details (optional)
               },
-
+              onEdit: () => _editHabit(vm),
+              onDelete: () => _deleteHabit(vm),
 
             );
           },
