@@ -80,10 +80,17 @@ class _SideNavState extends State<SideNav> {
                   ),
                   const SizedBox(height: 12),
                   _SideIcon(
-                    icon: Icons.construction_outlined,
-                    tooltip: "Placeholder",
+                    icon: Icons.autorenew_outlined,
+                    tooltip: "Habits",
                     selected: widget.selectedIndex == 5,
                     onTap: () => widget.onItemSelected(5),
+                  ),
+                  const SizedBox(height: 12),
+                  _SideIcon(
+                    icon: Icons.construction_outlined,
+                    tooltip: "Placeholder",
+                    selected: widget.selectedIndex == 6,
+                    onTap: () => widget.onItemSelected(6),
                   ),
                 ],
               ),
@@ -98,8 +105,8 @@ class _SideNavState extends State<SideNav> {
                   _SideIcon(
                     icon: Icons.settings_outlined,
                     tooltip: "Settings",
-                    selected: widget.selectedIndex == 6,
-                    onTap: () => widget.onItemSelected(6),
+                    selected: widget.selectedIndex == 7,
+                    onTap: () => widget.onItemSelected(7),
                   ),
                   const SizedBox(height: 12),
                   const CircleAvatar(

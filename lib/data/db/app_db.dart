@@ -36,6 +36,8 @@ class AppDb {
           await db.execute(DbConstants().leisureLedgerTableCreation);
           await db.execute(DbConstants().pointsLedgerCreation);
           await db.execute(DbConstants().lifePillarTableCreation);
+          await db.execute(DbConstants().habitTableCreation);
+          await db.execute(DbConstants().habitLogTableCreation);
         },
       ),
     );

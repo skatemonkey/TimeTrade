@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:time_vault/page/focus_page.dart';
+import 'package:time_vault/page/habit_page.dart';
 import 'package:time_vault/page/leisure_page.dart';
 import 'package:time_vault/page/life_pillar_page.dart';
 import 'package:time_vault/page/placeholder2_page.dart';
@@ -29,7 +30,10 @@ class _MainLayoutState extends State<MainLayout> {
     ShopPage(),
     PlaceholderPage(),
     LifePillarPage(),
-    Placeholder2Page(),
+    HabitPage(),
+    PlaceholderPage(),
+    PlaceholderPage(),
+    PlaceholderPage(),
   ];
 
   @override

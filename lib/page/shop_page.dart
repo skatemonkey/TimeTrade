@@ -85,7 +85,7 @@ class _ShopPageState extends State<ShopPage> {
 
   @override
   Widget build(BuildContext context) {
-    final canBuy = !_loading && _points >= 1.0;
+    final canBuy = !_loading && _points >= 240.0;
 
     return TemplatePage(
       title: "Shop",

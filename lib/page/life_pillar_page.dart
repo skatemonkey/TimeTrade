@@ -10,6 +10,7 @@ import '../data/dao/life_pillar_dao.dart';
 import '../data/models/life_pillar.dart';
 import '../widgets/AddPillarDialog.dart';
 import '../widgets/action_menu_button.dart';
+import '../widgets/add_button.dart';
 import '../widgets/confirm_dialog.dart';
 
 class LifePillarPage extends StatefulWidget {
@@ -90,37 +91,16 @@ class _LifePillarPageState extends State<LifePillarPage> {
     return TemplatePage(
       title: "Life Pillar",
       actions: [
-        SizedBox(
-          height: 40,
-          child: FilledButton.icon(
-            onPressed: () async {
-              // TODO: open create dialog / navigate to form
-              final created = await showDialog<LifePillar>(
-                context: context,
-                builder: (_) => const AddPillarDialog(isEdit: false),
-              );
-              if (created != null) {
-                await LifePillarDao.instance.insert(created);
-
-                setState(() {
-                  // _pillars.add(created);
-                  _loadLifePillars();
-                });
-              }
-            },
-            icon: const Icon(Icons.add_rounded, size: 20),
-            label: const Text('Add'),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.softBlack,
-              foregroundColor: AppColors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-            ),
+        AddButton<LifePillar>(
+          showDialogFn: (context) => showDialog<LifePillar>(
+            context: context,
+            builder: (_) => const AddPillarDialog(isEdit: false),
           ),
+          onInsert: (pillar) => LifePillarDao.instance.insert(pillar),
+          onReload: () => setState(() => _loadLifePillars()),
         ),
       ],
+
       child: AdvancedTableWidget(
         isLoadingAll: _isLoadingAll,
         isLoadingMore: _isLoadingMore,
