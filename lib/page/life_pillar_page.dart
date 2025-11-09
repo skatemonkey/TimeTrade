@@ -8,7 +8,7 @@ import '../app_colors.dart';
 import '../core/date_utils.dart';
 import '../data/dao/life_pillar_dao.dart';
 import '../data/models/life_pillar.dart';
-import '../widgets/AddPillarDialog.dart';
+import '../widgets/add_pillar_dialog.dart';
 import '../widgets/action_menu_button.dart';
 import '../widgets/add_button.dart';
 import '../widgets/confirm_dialog.dart';

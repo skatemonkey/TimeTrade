@@ -8,7 +8,7 @@ import '../data/dao/habit_log_dao.dart';
 import '../data/dao/points_ledger_dao.dart';
 import '../data/models/habit.dart';
 import '../data/models/points_ledger.dart';
-import '../widgets/AddHabitDialog.dart';
+import '../widgets/add_habit_dialog.dart';
 import '../widgets/add_button.dart';
 import '../widgets/habit_card.dart';
 import '../widgets/habit_check.dart';

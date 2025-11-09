@@ -11,7 +11,7 @@ import 'package:time_vault/page/shop_page.dart';
 
 import '../app_colors.dart';
 import '../services/TimerService.dart';
-import '../widgets/ActiveTimeBar.dart';
+import '../widgets/active_time_bar.dart';
 import '../widgets/side_nav.dart';
 
 class MainLayout extends StatefulWidget {
