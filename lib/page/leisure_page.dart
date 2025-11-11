@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../core/date_utils.dart';
 import '../data/dao/leisure_ledger_dao.dart';
 import '../services/TimerService.dart';
+import '../widgets/timer_section.dart';
 
 class LeisurePage extends StatefulWidget {
   const LeisurePage({super.key});
@@ -42,54 +43,54 @@ class _LeisurePageState extends State<LeisurePage> {
     }
   }
 
+  String _getRandomQuote() {
+    final quotes = [
+      "Rest is earned, not given.",
+      "Balance work and play — both shape you.",
+      "Enjoy the calm; you’ve earned it.",
+      "Recharge so you can rise stronger.",
+      "Use your time; don’t let it use you.",
+    ];
+    quotes.shuffle();
+    return quotes.first;
+  }
+
 
   @override
   Widget build(BuildContext context) {
     final svc = context.watch<TimerService>();
 
-    final isRunning = svc.isEntertainmentRunning;
+    final bool isRunning = svc.isEntertainmentRunning;
     final shownRemaining = isRunning ? svc.entertainmentLeftSec : _remainingSec;
-    final display = formatHMS(shownRemaining);
+    final String timeText = formatHMS(shownRemaining);
 
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            display,
-            style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+
+          TimerSection(
+            timeText: timeText,
+            isRunning: isRunning,
+            onPressed: (shownRemaining > 0 || isRunning) ? _toggle : () {},
           ),
-          const SizedBox(height: 24),
-          InkWell(
-            onTap: (shownRemaining > 0 || isRunning) ? _toggle : null,
-            borderRadius: BorderRadius.circular(18),
-            child: Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE6D9FF),
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: const [
-                  BoxShadow(
-                    blurRadius: 12,
-                    offset: Offset(0, 6),
-                    color: Color(0x22000000),
-                  ),
-                ],
-              ),
-              child: Icon(
-                isRunning ? Icons.stop : Icons.play_arrow,
-                size: 32,
-                color: const Color(0xFF2B134D),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
+
+          const SizedBox(height: 25),
           if (!isRunning && shownRemaining <= 0)
             const Text(
               "No time left — earn more by focusing",
               style: TextStyle(color: Colors.grey),
+            )
+          else
+            Text(
+              _getRandomQuote(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.grey,
+                fontStyle: FontStyle.italic,
+              ),
             ),
+
         ],
       ),
     );

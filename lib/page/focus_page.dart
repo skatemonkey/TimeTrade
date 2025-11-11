@@ -5,6 +5,7 @@ import '../data/dao/life_pillar_dao.dart';
 import '../data/models/life_pillar.dart';
 import '../services/TimerService.dart';
 import '../core/date_utils.dart';
+import '../widgets/timer_section.dart';
 
 class FocusPage extends StatefulWidget {
   const FocusPage({super.key});
@@ -29,53 +30,24 @@ class _FocusPageState extends State<FocusPage> {
   @override
   Widget build(BuildContext context) {
     final svc = context.watch<TimerService>();
-    final isRunning = svc.isFocusRunning;
+    final bool isRunning = svc.isFocusRunning;
+    final String timeText = formatDate1(svc.elapsed); // you already use this    // ✅ elapsed, not shownRemaining
 
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            formatDate1(svc.elapsed),
-            style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 24),
-          InkWell(
-            onTap: () async {
+          TimerSection(
+            timeText: timeText,
+            isRunning: isRunning,
+            onPressed: () {
               if (isRunning) {
-                svc.stopFocusAndReset(); // stop + persist
+                svc.stopFocusAndReset();           // stop + persist
               } else {
-                // ensure a pillar is selected before starting
-                if (svc.selectedLifePillarId == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Add a Life Pillar first.')),
-                  );
-                  return;
-                }
-                svc.startFocus(); // start
+                // (optional) ensure pillar chosen here if you require it
+                svc.startFocus();                  // start
               }
             },
-            borderRadius: BorderRadius.circular(18),
-            child: Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE6D9FF),
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: const [
-                  BoxShadow(
-                    blurRadius: 12,
-                    offset: Offset(0, 6),
-                    color: Color(0x22000000),
-                  ),
-                ],
-              ),
-              child: Icon(
-                isRunning ? Icons.stop : Icons.play_arrow,
-                size: 32,
-                color: const Color(0xFF2B134D),
-              ),
-            ),
           ),
 
           const SizedBox(height: 32),
