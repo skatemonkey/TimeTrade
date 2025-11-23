@@ -11,7 +11,7 @@ import '../data/models/points_ledger.dart';
 import '../widgets/add_habit_dialog.dart';
 import '../widgets/add_button.dart';
 import '../widgets/habit_card.dart';
-import '../widgets/habit_check.dart';
+import 'habit_detail_page.dart';
 
 class HabitPage extends StatefulWidget {
   const HabitPage({super.key});
@@ -23,9 +23,14 @@ class HabitPage extends StatefulWidget {
 class _HabitPageState extends State<HabitPage> {
   bool _isLoading = true;
   final List<HabitVm> _habits = [];
-
   final Set<int> _loadingHabitIds = {};
+
+  HabitVm? _selected;            // 👈 track which habit is opened
+
   bool _isCardLoading(int id) => _loadingHabitIds.contains(id);
+
+  void _openDetail(HabitVm vm) => setState(() => _selected = vm);
+  void _closeDetail() => setState(() => _selected = null);
 
 
   @override
@@ -181,29 +186,46 @@ class _HabitPageState extends State<HabitPage> {
 
   @override
   Widget build(BuildContext context) {
-    return TemplatePage(title: "Habit",
+    final inDetail = _selected != null;
+
+    return TemplatePage(
+      title: inDetail ? "Habit · ${_selected!.name}" : "Habit",
+      onTitleTap: inDetail ? _closeDetail : null,  // 👈 click title to go back
       actions: [
-        AddButton<Habit>(
-          showDialogFn: (context) => showDialog<Habit>(
-            context: context,
-            builder: (_) => const AddHabitDialog(isEdit: false),
+        if (inDetail)
+          IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            onPressed: _closeDetail,
+          )
+        else
+          AddButton<Habit>(
+            showDialogFn: (context) => showDialog<Habit>(
+              context: context,
+              builder: (_) => const AddHabitDialog(isEdit: false),
+            ),
+            onInsert: (habit) => HabitDao.instance.insert(habit),
+            onReload: () => setState(() => _loadHabits()),
           ),
-          onInsert: (habit) => HabitDao.instance.insert(habit),
-          onReload: () => setState(() => _loadHabits()),
-        ),
       ],
 
 
 
       child: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _habits.isEmpty
+          : _habits.isEmpty && !inDetail
           ? const Center(child: Text('No habits yet'))
+          : inDetail
+          ? HabitDetailPage(
+        vm: _selected!,
+        onBack: _closeDetail,
+        onEdit: () => _editHabit(_selected!),
+        onDelete: () => _deleteHabit(_selected!),
+      )
           : Padding(
         padding: const EdgeInsets.all(16),
         child: GridView.builder(
           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 260, // controls how many per row
+            maxCrossAxisExtent: 260,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
             childAspectRatio: 1.2,
@@ -215,9 +237,7 @@ class _HabitPageState extends State<HabitPage> {
               vm: vm,
               isLoading: _isCardLoading(vm.id),
               onToggleToday: (v) => _toggleToday(vm, v),
-              onTap: () {
-                // TODO: navigate to details (optional)
-              },
+              onTap: () => _openDetail(vm),     // 👈 just toggle
               onEdit: () => _editHabit(vm),
               onDelete: () => _deleteHabit(vm),
 

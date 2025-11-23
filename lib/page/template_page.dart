@@ -27,6 +27,7 @@ class TemplatePage extends StatelessWidget {
     this.floatingActionButton,
     this.backgroundColor,
     this.actionsTopOffset = 50, // 👈 small gap from top, tweak as you like
+    this.onTitleTap, // 👈 new
   });
 
   final String title;
@@ -41,6 +42,7 @@ class TemplatePage extends StatelessWidget {
   final Widget? floatingActionButton;
   final Color? backgroundColor;
   final double actionsTopOffset;
+  final VoidCallback? onTitleTap; // 👈 new
 
   @override
   Widget build(BuildContext context) {
@@ -77,11 +79,23 @@ class TemplatePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Title only (actions are floated separately)
-                  Text(
-                    title,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
-                    overflow: TextOverflow.ellipsis,
+                  GestureDetector(
+                    onTap: onTitleTap, // 👈 will be null if not provided
+                    child: MouseRegion(
+                      cursor: onTitleTap != null
+                          ? SystemMouseCursors.click
+                          : SystemMouseCursors.basic,
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ),
+
                   const SizedBox(height: 24),
 
                   // Card

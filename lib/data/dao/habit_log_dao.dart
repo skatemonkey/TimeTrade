@@ -78,4 +78,16 @@ class HabitLogDao {
       whereArgs: [habitId, date],
     );
   }
+
+  Future<List<String>> getDatesForHabit(int habitId) async {
+    final db = await AppDb.instance.database;
+    final rows = await db.query(
+      'habit_log',
+      columns: ['date'],
+      where: 'habit_id = ?',
+      whereArgs: [habitId],
+    );
+    return rows.map((r) => r['date'] as String).toList();
+  }
+
 }
