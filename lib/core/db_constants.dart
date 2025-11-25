@@ -3,6 +3,7 @@ import 'package:time_vault/data/models/leisure_ledger.dart';
 
 import '../data/models/habit.dart';
 import '../data/models/habit_log.dart';
+import '../data/models/item.dart';
 import '../data/models/life_pillar.dart';
 import '../data/models/points_ledger.dart';
 
@@ -83,5 +84,17 @@ class DbConstants {
         ''';
 
 
+  String itemsTableCreation = '''
+        CREATE TABLE ${ItemFields.table}
+        (
+          ${ItemFields.id}          INTEGER PRIMARY KEY AUTOINCREMENT,
+          ${ItemFields.key}         TEXT    NOT NULL,
+          ${ItemFields.name}        TEXT    NOT NULL,
+          ${ItemFields.description} TEXT,
+          ${ItemFields.costPoints}  REAL    NOT NULL,
+          ${ItemFields.createdTs}   INTEGER NOT NULL,
+          ${ItemFields.updatedTs}   INTEGER NOT NULL
+        );
+        ''';
 
 }

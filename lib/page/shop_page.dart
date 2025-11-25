@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:time_vault/core/constants.dart';
 import 'package:time_vault/data/dao/leisure_ledger_dao.dart';
 import 'package:time_vault/data/dao/points_ledger_dao.dart';
 import 'package:time_vault/data/models/leisure_ledger.dart';
@@ -7,6 +7,12 @@ import 'package:time_vault/page/template_page.dart';
 
 import '../app_colors.dart';
 import '../data/models/points_ledger.dart';
+
+// add these
+import 'package:time_vault/data/dao/item_dao.dart';
+import 'package:time_vault/data/models/item.dart';
+
+import '../widgets/edit_item_price_dialog.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key});
@@ -19,10 +25,15 @@ class _ShopPageState extends State<ShopPage> {
   double _points = 0.0;
   bool _loading = false;
 
+  Item? _item1Hour;
+  Item? _item1Day;
+  bool _itemsLoading = true;
+
   @override
   void initState() {
     super.initState();
     _refreshPoints();
+    _loadItems();
   }
 
   Future<void> _refreshPoints() async {
@@ -31,8 +42,46 @@ class _ShopPageState extends State<ShopPage> {
     setState(() => _points = v); // already 2-decimal rounded from SQL
   }
 
+  Future<void> _loadItems() async {
+    try {
+      final itemHour =
+      await ItemDao.instance.getByKey(Constants().leisureOneHour);
+      final itemDay =
+      await ItemDao.instance.getByKey(Constants().leisureOneDay);
+
+      if (!mounted) return;
+      setState(() {
+        _item1Hour = itemHour;
+        _item1Day = itemDay;
+        _itemsLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _itemsLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load shop items: $e')),
+      );
+    }
+  }
+
+  Future<void> _refreshAll() async {
+    await Future.wait([
+      _refreshPoints(),
+      _loadItems(),
+    ]);
+  }
+
   Future<void> _buyOneHour() async {
-    const price = 240.0; // 1 point -> 1 hour (3600 sec)
+    if (_item1Hour == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Item not loaded yet')),
+      );
+      return;
+    }
+
+    final price = _item1Hour!.costPoints;
 
     if (_points < price) {
       if (mounted) {
@@ -46,7 +95,7 @@ class _ShopPageState extends State<ShopPage> {
     setState(() => _loading = true);
 
     try {
-      // 2) Credit entertainment wallet (+3600 sec)
+      // credit entertainment wallet (+3600 sec)
       final leisureLedger = LeisureLedger(
         ts: DateTime.now().millisecondsSinceEpoch,
         deltaSec: 3600,
@@ -55,11 +104,11 @@ class _ShopPageState extends State<ShopPage> {
         leisureLedger,
       );
 
-      // 1) Spend a point (points_ledger: -1.0)
+      // spend points
       final spend = PointsLedger(
         ts: DateTime.now().millisecondsSinceEpoch,
         source: 'spend',
-        refType: 'entertainment',
+        refType: 'entertainment_1h',
         refId: timewalletid,
         delta: -price,
       );
@@ -68,7 +117,9 @@ class _ShopPageState extends State<ShopPage> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Purchased 1 hour 🎉')));
+        ).showSnackBar(SnackBar(
+          content: Text('Purchased ${_item1Hour!.name} 🎉'),
+        ));
       }
 
       await _refreshPoints();
@@ -83,9 +134,110 @@ class _ShopPageState extends State<ShopPage> {
     }
   }
 
+  Future<void> _buyOneDay() async {
+    if (_item1Day == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Item not loaded yet')),
+      );
+      return;
+    }
+
+    final price = _item1Day!.costPoints;
+
+    if (_points < price) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Not enough points')));
+      }
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    try {
+      // spend points
+      final spend = PointsLedger(
+        ts: DateTime.now().millisecondsSinceEpoch,
+        source: 'spend',
+        refType: 'entertainment_1day',
+        refId: null,
+        delta: -price,
+      );
+      await PointsLedgerDao.instance.insert(spend);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(
+          content: Text('Purchased ${_item1Day!.name} 🎉'),
+        ));
+      }
+
+      await _refreshPoints();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Purchase failed: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _editItemPrice(Item item) async {
+    final newPrice = await showDialog<double>(
+      context: context,
+      builder: (ctx) => EditItemPriceDialog(item: item),
+    );
+
+    if (newPrice == null) return;
+
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final updated = Item(
+        id: item.id,
+        key: item.key,
+        name: item.name,
+        description: item.description,
+        costPoints: newPrice,
+        createdTs: item.createdTs,
+        updatedTs: now,
+      );
+
+      await ItemDao.instance.update(updated);
+
+      setState(() {
+        if (item.key == Constants().leisureOneHour) {
+          _item1Hour = updated;
+        } else if (item.key == Constants().leisureOneDay) {
+          _item1Day = updated;
+        }
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Price updated')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update price: $e')),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    final canBuy = !_loading && _points >= 240.0;
+    final canBuyHour = !_loading &&
+        !_itemsLoading &&
+        _item1Hour != null &&
+        _points >= _item1Hour!.costPoints;
+
+    final canBuyDay = !_loading &&
+        !_itemsLoading &&
+        _item1Day != null &&
+        _points >= _item1Day!.costPoints;
 
     return TemplatePage(
       title: "Shop",
@@ -114,47 +266,89 @@ class _ShopPageState extends State<ShopPage> {
               trailing: IconButton(
                 icon: const Icon(Icons.refresh),
                 tooltip: 'Refresh',
-                onPressed: _loading ? null : _refreshPoints,
+                onPressed: _loading ? null : _refreshAll,
               ),
             ),
           ),
         ),
       ],
       child: RefreshIndicator(
-        onRefresh: _refreshPoints,
+        onRefresh: _refreshAll,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Card(
-            //   child: ListTile(
-            //     title: const Text('Your Points'),
-            //     subtitle: Text(
-            //       _loading ? 'Updating…' : _points.toStringAsFixed(2),
-            //     ),
-            //     trailing: IconButton(
-            //       icon: const Icon(Icons.refresh),
-            //       onPressed: _loading ? null : _refreshPoints,
-            //     ),
-            //   ),
-            // ),
-            // const SizedBox(height: 12),
             Card(
               color: AppColors.bg,
               child: ListTile(
                 leading: const Icon(Icons.timer_outlined),
-                title: const Text('1 Hour Entertainment Time'),
-                subtitle: const Text(
-                  'Price: 240.00 point • Adds +3600s to wallet',
+                title: Text(
+                  _item1Hour?.name ?? '1 Hour Entertainment Time',
                 ),
-                trailing: ElevatedButton(
-                  onPressed: canBuy ? _buyOneHour : null,
-                  child: _loading
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Buy'),
+                subtitle: Text(
+                  _itemsLoading || _item1Hour == null
+                      ? 'Loading item...'
+                      : 'Price: ${_item1Hour!.costPoints.toStringAsFixed(2)} points • Adds +3600s to wallet',
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      tooltip: 'Edit price',
+                      onPressed: (_itemsLoading || _item1Hour == null)
+                          ? null
+                          : () => _editItemPrice(_item1Hour!),
+                    ),
+                    ElevatedButton(
+                      onPressed: canBuyHour ? _buyOneHour : null,
+                      child: _loading
+                          ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child:
+                        CircularProgressIndicator(strokeWidth: 2),
+                      )
+                          : const Text('Buy'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              color: AppColors.bg,
+              child: ListTile(
+                leading: const Icon(Icons.calendar_today_outlined),
+                title: Text(
+                  _item1Day?.name ?? '1 Day Entertainment Time',
+                ),
+                subtitle: Text(
+                  _itemsLoading || _item1Day == null
+                      ? 'Loading item...'
+                      : 'Price: ${_item1Day!.costPoints.toStringAsFixed(2)} points • Adds 1 day to placeholder',
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      tooltip: 'Edit price',
+                      onPressed: (_itemsLoading || _item1Day == null)
+                          ? null
+                          : () => _editItemPrice(_item1Day!),
+                    ),
+                    ElevatedButton(
+                      onPressed: canBuyDay ? _buyOneDay : null,
+                      child: _loading
+                          ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child:
+                        CircularProgressIndicator(strokeWidth: 2),
+                      )
+                          : const Text('Buy'),
+                    ),
+                  ],
                 ),
               ),
             ),
